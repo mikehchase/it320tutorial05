@@ -40,28 +40,31 @@ function wp_users_reader_entry_point ( $attributes ) {
 
     //Echo out a table header using start string values
     //
-	echo "<table border=\"2\">";
+	$output =  "<table border=\"2\">";
 	
-	echo "<tr>";
-	echo "<th>"  . "User Nicename"  .  "</th>" 
+	$output .=   "<tr>";
+	$output .=   "<th>"  . "User Nicename"  .  "</th>" 
 		. "<th>" . "User Email"     .  "</th>" 
 		. "<th>" . "User Status"    .  "</th>";
-	echo "</tr>";
+	$output .=   "</tr>";
 
 	//Iterate the array of DB row objects and put them in HTML table cells
 	// 
 	foreach($result as $row)  {
-	 echo "<tr>";
+
+	 $output .=   "<tr>";
 	
 	 //Each table row column data item is accessed using it's column name 
 	 // 
-	 echo   "<td>" . $row->user_nicename . "</td>"
+	 $output .=    "<td>" . $row->user_nicename . "</td>"
 		  . "<td>" . $row->user_email . "</td>"
 		  . "<td>" . $row->user_status   . "</td>";
 		  
-	 echo "</tr>";
+	 $output .=   "</tr>";
 	}
 
-	echo "</table>";
+	$output .=   "</table>";
+	
+	return $output;
 }
 ?>

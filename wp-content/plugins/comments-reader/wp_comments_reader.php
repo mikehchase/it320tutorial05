@@ -42,14 +42,16 @@ function wp_comments_reader_entry_point( $attributes ) {
 
     //Echo out a table header using start string values
     //
-	echo "<table border=\"1\">";
+	$output = "";
+
+	$output .= "<table border=\"1\">";
 	
-	echo "<tr>";
-	echo "<th>"  . "Comment Post ID"        . "</th>" 
-		. "<th>" . "Comment Author"    . "</th>" 
-		. "<th>" . "Comment Date" . "</th>" 
-		. "<th>" . "Comment Content"     . "</th>";
-	echo "</tr>";
+	$output .= "<tr>";
+	$output .= "<th>"  . "Comment Post ID"  . "</th>" 
+		    . "<th>" . "Comment Author"     . "</th>" 
+		    . "<th>" . "Comment Date"       . "</th>" 
+		    . "<th>" . "Comment Content"    . "</th>";
+	$output .= "</tr>";
 
 	//Iterate the array of DB row objects and put them in HTML table cells
 	// 
@@ -59,14 +61,16 @@ function wp_comments_reader_entry_point( $attributes ) {
 	 
 	 //Each table row column data item is accessed using it's column name 
 	 //
-	 echo   "<td>" . $row->comment_post_ID . "</td>"
-		  . "<td>" . $row->comment_author . "</td>"
-		  . "<td>" . $row->comment_date . "</td>"
-		  . "<td>" . $row->comment_content  . "</td>";
+	 $output .=   "<td>" . $row->comment_post_ID . "</td>"
+		  . "<td>" . $row->comment_author    . "</td>"
+		  . "<td>" . $row->comment_date      . "</td>"
+		  . "<td>" . $row->comment_content   . "</td>";
 		  
-	 echo "</tr>";
+	 $output .= "</tr>";
 	}
 
-	echo "</table>";
+	$output .= "</table>";
+	
+	return $output;
 }
 ?>

@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2014-2019 ServMask Inc.
+ * Copyright (C) 2014-2020 ServMask Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,9 +30,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Ai1wm_Import_Done {
 
 	public static function execute( $params ) {
+		global $wp_rewrite;
 
 		// Check multisite.json file
-		if ( true === is_file( ai1wm_multisite_path( $params ) ) ) {
+		if ( is_file( ai1wm_multisite_path( $params ) ) ) {
 
 			// Read multisite.json file
 			$handle = ai1wm_open( ai1wm_multisite_path( $params ), 'r' );
@@ -75,6 +76,7 @@ class Ai1wm_Import_Done {
 					ai1wm_discover_plugin_basename( 'join-my-multisite/joinmymultisite.php' ),
 					ai1wm_discover_plugin_basename( 'multisite-clone-duplicator/multisite-clone-duplicator.php' ),
 					ai1wm_discover_plugin_basename( 'wordpress-mu-domain-mapping/domain_mapping.php' ),
+					ai1wm_discover_plugin_basename( 'wordpress-starter/siteground-wizard.php' ),
 					ai1wm_discover_plugin_basename( 'pro-sites/pro-sites.php' ),
 				)
 			);
@@ -88,10 +90,13 @@ class Ai1wm_Import_Done {
 			// Flush Elementor cache
 			ai1wm_elementor_cache_flush();
 
+			// Initial DB version
+			ai1wm_initial_db_version();
+
 		} else {
 
 			// Check package.json file
-			if ( true === is_file( ai1wm_package_path( $params ) ) ) {
+			if ( is_file( ai1wm_package_path( $params ) ) ) {
 
 				// Read package.json file
 				$handle = ai1wm_open( ai1wm_package_path( $params ), 'r' );
@@ -144,6 +149,7 @@ class Ai1wm_Import_Done {
 						ai1wm_discover_plugin_basename( 'join-my-multisite/joinmymultisite.php' ),
 						ai1wm_discover_plugin_basename( 'multisite-clone-duplicator/multisite-clone-duplicator.php' ),
 						ai1wm_discover_plugin_basename( 'wordpress-mu-domain-mapping/domain_mapping.php' ),
+						ai1wm_discover_plugin_basename( 'wordpress-starter/siteground-wizard.php' ),
 						ai1wm_discover_plugin_basename( 'pro-sites/pro-sites.php' ),
 					)
 				);
@@ -156,11 +162,14 @@ class Ai1wm_Import_Done {
 
 				// Flush Elementor cache
 				ai1wm_elementor_cache_flush();
+
+				// Initial DB version
+				ai1wm_initial_db_version();
 			}
 		}
 
 		// Check blogs.json file
-		if ( true === is_file( ai1wm_blogs_path( $params ) ) ) {
+		if ( is_file( ai1wm_blogs_path( $params ) ) ) {
 
 			// Read blogs.json file
 			$handle = ai1wm_open( ai1wm_blogs_path( $params ), 'r' );
@@ -216,6 +225,7 @@ class Ai1wm_Import_Done {
 						ai1wm_discover_plugin_basename( 'join-my-multisite/joinmymultisite.php' ),
 						ai1wm_discover_plugin_basename( 'multisite-clone-duplicator/multisite-clone-duplicator.php' ),
 						ai1wm_discover_plugin_basename( 'wordpress-mu-domain-mapping/domain_mapping.php' ),
+						ai1wm_discover_plugin_basename( 'wordpress-starter/siteground-wizard.php' ),
 						ai1wm_discover_plugin_basename( 'pro-sites/pro-sites.php' ),
 					)
 				);
@@ -228,24 +238,23 @@ class Ai1wm_Import_Done {
 
 				// Flush Elementor cache
 				ai1wm_elementor_cache_flush();
+
+				// Initial DB version
+				ai1wm_initial_db_version();
 			}
 		}
 
+		// Switch to default permalink structure
+		if ( ! ai1wm_got_url_rewrite() ) {
+			$wp_rewrite->set_permalink_structure( '' );
+		}
+
 		// Set progress
-		Ai1wm_Status::done(
-			__(
-				'Your site has been imported successfully!',
-				AI1WM_PLUGIN_NAME
-			),
-			sprintf(
-				__(
-					'» <a class="ai1wm-no-underline" href="%s" target="_blank">Save permalinks structure</a>.</strong> (opens a new window)<br />' .
-					'» <a class="ai1wm-no-underline" href="https://wordpress.org/support/view/plugin-reviews/all-in-one-wp-migration?rate=5#postform" target="_blank">Optionally, review the plugin</a>.</strong> (opens a new window)',
-					AI1WM_PLUGIN_NAME
-				),
-				admin_url( 'options-permalink.php#submit' )
-			)
-		);
+		if ( ai1wm_validate_plugin_basename( 'oxygen/functions.php' ) ) {
+			Ai1wm_Status::done( __( 'Your site has been imported successfully!', AI1WM_PLUGIN_NAME ), Ai1wm_Template::get_content( 'import/oxygen' ) );
+		} else {
+			Ai1wm_Status::done( __( 'Your site has been imported successfully!', AI1WM_PLUGIN_NAME ), Ai1wm_Template::get_content( 'import/done' ) );
+		}
 
 		return $params;
 	}

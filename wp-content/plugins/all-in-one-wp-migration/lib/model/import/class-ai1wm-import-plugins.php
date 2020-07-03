@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2014-2019 ServMask Inc.
+ * Copyright (C) 2014-2020 ServMask Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ class Ai1wm_Import_Plugins {
 		global $wpdb;
 
 		// Set progress
-		Ai1wm_Status::info( __( 'Activating plugins...', AI1WM_PLUGIN_NAME ) );
+		Ai1wm_Status::info( __( 'Preparing plugins...', AI1WM_PLUGIN_NAME ) );
 
 		// Get database client
 		if ( is_null( $mysql ) ) {
@@ -78,7 +78,7 @@ class Ai1wm_Import_Plugins {
 		}
 
 		// Set progress
-		Ai1wm_Status::info( __( 'Done activating plugins.', AI1WM_PLUGIN_NAME ) );
+		Ai1wm_Status::info( __( 'Done preparing plugins.', AI1WM_PLUGIN_NAME ) );
 
 		return $params;
 	}

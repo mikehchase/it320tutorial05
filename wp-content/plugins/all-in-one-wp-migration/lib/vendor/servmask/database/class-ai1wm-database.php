@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2014-2019 ServMask Inc.
+ * Copyright (C) 2014-2020 ServMask Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -79,6 +79,20 @@ abstract class Ai1wm_Database {
 	protected $new_replace_values = array();
 
 	/**
+	 * Old raw replace values
+	 *
+	 * @var array
+	 */
+	protected $old_replace_raw_values = array();
+
+	/**
+	 * New raw replace values
+	 *
+	 * @var array
+	 */
+	protected $new_replace_raw_values = array();
+
+	/**
 	 * Table where clauses
 	 *
 	 * @var array
@@ -119,6 +133,13 @@ abstract class Ai1wm_Database {
 	 * @var boolean
 	 */
 	protected $visual_composer = false;
+
+	/**
+	 * Oxygen Builder
+	 *
+	 * @var boolean
+	 */
+	protected $oxygen_builder = false;
 
 	/**
 	 * BeTheme Responsive
@@ -478,6 +499,27 @@ abstract class Ai1wm_Database {
 	}
 
 	/**
+	 * Set Oxygen Builder
+	 *
+	 * @param  boolean $active Is Oxygen Builder Active?
+	 * @return object
+	 */
+	public function set_oxygen_builder( $active ) {
+		$this->oxygen_builder = $active;
+
+		return $this;
+	}
+
+	/**
+	 * Get Oxygen Builder
+	 *
+	 * @return boolean
+	 */
+	public function get_oxygen_builder() {
+		return $this->oxygen_builder;
+	}
+
+	/**
 	 * Set BeTheme Responsive
 	 *
 	 * @param  boolean $active Is BeTheme Responsive Active?
@@ -581,6 +623,9 @@ abstract class Ai1wm_Database {
 	public function get_tables() {
 		$tables = array();
 
+		// Get lower case table names
+		$lower_case_table_names = $this->get_lower_case_table_names();
+
 		// Get base tables and views
 		foreach ( array_merge( $this->get_base_tables(), $this->get_views() ) as $table_name ) {
 
@@ -590,9 +635,16 @@ abstract class Ai1wm_Database {
 
 				// Check table prefixes
 				foreach ( $this->get_include_table_prefixes() as $prefix ) {
-					if ( stripos( $table_name, $prefix ) === 0 ) {
-						$include = true;
-						break;
+					if ( $lower_case_table_names ) {
+						if ( stripos( $table_name, $prefix ) === 0 ) {
+							$include = true;
+							break;
+						}
+					} else {
+						if ( strpos( $table_name, $prefix ) === 0 ) {
+							$include = true;
+							break;
+						}
 					}
 				}
 
@@ -608,9 +660,16 @@ abstract class Ai1wm_Database {
 
 				// Check table prefixes
 				foreach ( $this->get_exclude_table_prefixes() as $prefix ) {
-					if ( stripos( $table_name, $prefix ) === 0 ) {
-						$exclude = true;
-						break;
+					if ( $lower_case_table_names ) {
+						if ( stripos( $table_name, $prefix ) === 0 ) {
+							$exclude = true;
+							break;
+						}
+					} else {
+						if ( strpos( $table_name, $prefix ) === 0 ) {
+							$exclude = true;
+							break;
+						}
 					}
 				}
 
@@ -1067,6 +1126,24 @@ abstract class Ai1wm_Database {
 	}
 
 	/**
+	 * Get MySQL lower case table names
+	 *
+	 * @return integer
+	 */
+	protected function get_lower_case_table_names() {
+		$result = $this->query( "SHOW VARIABLES LIKE 'lower_case_table_names'" );
+		$row    = $this->fetch_assoc( $result );
+
+		// Close result cursor
+		$this->free_result( $result );
+
+		// Get lower case table names
+		if ( isset( $row['Value'] ) ) {
+			return $row['Value'];
+		}
+	}
+
+	/**
 	 * Get MySQL collation name
 	 *
 	 * @param  string $collation_name Collation name
@@ -1098,7 +1175,7 @@ abstract class Ai1wm_Database {
 		// Close result cursor
 		$this->free_result( $result );
 
-		// Get create table
+		// Get create view
 		if ( isset( $row['Create View'] ) ) {
 			return $row['Create View'];
 		}
@@ -1327,6 +1404,11 @@ abstract class Ai1wm_Database {
 			$input = preg_replace_callback( '/\[vc_raw_html\]([a-zA-Z0-9\/+]+={0,2})\[\/vc_raw_html\]/S', array( $this, 'replace_visual_composer_values_callback' ), $input );
 		}
 
+		// Replace base64 encoded values (Oxygen Builder)
+		if ( $this->get_oxygen_builder() ) {
+			$input = preg_replace_callback( '/\\\\"(code-php|code-css|code-js)\\\\":\\\\"([a-zA-Z0-9\/+]+={0,2})\\\\"/S', array( $this, 'replace_oxygen_builder_values_callback' ), $input );
+		}
+
 		// Replace base64 encoded values (BeTheme Responsive and Optimize Press)
 		if ( $this->get_betheme_responsive() || $this->get_optimize_press() ) {
 			$input = preg_replace_callback( "/'([a-zA-Z0-9\/+]+={0,2})'/S", array( $this, 'replace_base64_values_callback' ), $input );
@@ -1364,6 +1446,29 @@ abstract class Ai1wm_Database {
 		}
 
 		return '[vc_raw_html]' . $matches[1] . '[/vc_raw_html]';
+	}
+
+	/**
+	 * Replace base64 values callback (Oxygen Builder)
+	 *
+	 * @param  array  $matches List of matches
+	 * @return string
+	 */
+	protected function replace_oxygen_builder_values_callback( $matches ) {
+		// Validate base64 data
+		if ( Ai1wm_Database_Utility::base64_validate( $matches[2] ) ) {
+
+			// Decode base64 characters
+			$matches[2] = Ai1wm_Database_Utility::base64_decode( $matches[2] );
+
+			// Replace values
+			$matches[2] = Ai1wm_Database_Utility::replace_values( $this->get_old_replace_values(), $this->get_new_replace_values(), $matches[2] );
+
+			// Encode base64 characters
+			$matches[2] = Ai1wm_Database_Utility::base64_encode( $matches[2] );
+		}
+
+		return '\"' . $matches[1] . '\":\"' . $matches[2] . '\"';
 	}
 
 	/**

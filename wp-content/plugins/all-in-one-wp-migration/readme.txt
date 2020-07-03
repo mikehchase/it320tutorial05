@@ -2,9 +2,9 @@
 Contributors: yani.iliev, bangelov, pimjitsawang
 Tags: move, transfer, copy, migrate, backup, clone, restore, db migration, wordpress migration, website migration, database export, database import, apoyo, sauvegarde, di riserva, バックアップ
 Requires at least: 3.3
-Tested up to: 5.3
+Tested up to: 5.4
 Requires PHP: 5.2.17
-Stable tag: 7.13
+Stable tag: 7.24
 License: GPLv2 or later
 
 Move, transfer, copy, migrate, and backup a site with 1-click. Quick, easy, and reliable.
@@ -15,7 +15,7 @@ Upload your site to a different location with a drag and drop in to WordPress.
 There is an option to apply an unlimited number of find and replace operations on your database during the export process. The plugin will also fix any
 serialisation problems that occur during the find/replace operation.
 
-Mobile device compatible: All in One WP Plugin is the first plugin to offer true mobile experience on WordPress versions 3.3 and up.
+Mobile device compatible: All-in-One WP Migration is the first plugin to offer true mobile experience on WordPress versions 3.3 and up.
 
 = No limitations on host or operating system =
 * We have tested the plugin on the major Linux distributions, MacOS and Microsoft Windows.
@@ -108,6 +108,79 @@ Alternatively you can download the plugin using the download button on this page
 All-in-One WP Migration **asks for your consent** to collect **requester's email address** when filling plugin's contact form. [GDPR Compliant Privacy Policy](https://www.iubenda.com/privacy-policy/946881)
 
 == Changelog ==
+= 7.24 =
+**Added**
+
+* Improved support for SiteGround hosting
+
+= 7.23 =
+**Added**
+
+* Improved support for revslider plugin
+* Improved support for WordPress.com migrations
+
+= 7.22 =
+**Added**
+
+* Improved upload path replacement
+* Set permalinks structure to default when pretty permalinks are not supported
+
+**Fixed**
+
+* Exclude media from advanced options
+
+= 7.21 =
+**Added**
+
+* Better compatibility to Oxygen Builder. Thanks Rookie for reporting it
+
+= 7.20 =
+**Fixed**
+
+* Total files number in enumerate and content steps
+
+= 7.19 =
+**Added**
+
+* Support for custom upload directory
+
+= 7.18 =
+**Added**
+
+* Use case-sensitive prefix when the SQL server has it defined. This allows to have multiple WordPress installations in the same database with case sensitive prefix: wp_, WP_, Wp_, wP_
+
+**Fixed**
+
+* Removed a delay from stopping an export or import
+
+= 7.17 =
+**Fixed**
+
+* Compatibility with Apache v2.4 .htaccess. Thanks Pieter Daalder for reporting it.
+
+= 7.16 =
+**Added**
+
+* Store upload_path in the backup
+
+= 7.15 =
+**Added**
+
+* Exclude web.config and .htaccess direct access from each other
+
+**Fixed**
+
+* Long backup names break download button layout
+
+= 7.14 =
+**Added**
+
+* Display a message when disk space is not enough while importing a file
+
+**Changed**
+
+* Text improvements during import
+
 = 7.13 =
 **Added**
 
